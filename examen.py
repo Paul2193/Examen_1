@@ -1,27 +1,29 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
-import gdown
 from scipy.stats import chi2_contingency, kruskal, ttest_ind
 import matplotlib.pyplot as plt
 import seaborn as sns
 import folium
 from streamlit_folium import st_folium
+import os
+import gdown
 
 st.title('Análisis Estadístico de Crímenes en la ciudad de "Los Angeles"')
 
-
+# 👉 Cargar y limpiar los datos
 @st.cache_data
 def load_data():
-    file_id = '1-skQNlFb1w4RIRQRG4-WH-txfQA3RtlP'
+    file_id = '1-skQNlFb1w4RIRQRG4-WH-txfQA3RtlP'  # ID del archivo en Google Drive
     url = f'https://drive.google.com/uc?id={file_id}'
     output = 'Crime_Data_from_2020_to_Present.csv'
-    
+
     if not os.path.exists(output):
         gdown.download(url, output, quiet=False)
-    
-    df = pd.read_csv(output)
+
+    # 🚀 Cargar solo 90,000 filas para balancear rendimiento y representatividad
+    df = pd.read_csv(output, nrows=90000)
+
     column_translation = {
         'DR_NO': 'Número Reporte',
         'Date Rptd': 'Fecha Reporte',
@@ -56,16 +58,16 @@ def load_data():
     df = df.dropna(subset=['Edad Víctima', 'Sexo Víctima', 'Latitud', 'Longitud'])
     df = df[df['Sexo Víctima'].isin(['M', 'F'])]
     df['Edad Víctima'] = pd.to_numeric(df['Edad Víctima'], errors='coerce')
-    
+
     df_completo = df.dropna(subset=['Código Arma', 'Descripción Arma', 'Código Estado', 'Descripción Estado'])
     df_valid_age = df[df['Edad Víctima'] > 0]
-    
+
     return df, df_completo, df_valid_age
 
 df, df_completo, df_valid_age = load_data()
-df_sample = df.sample(n=20000, random_state=42)
+df_sample = df.sample(n=5000, random_state=42)  # para mapas, usa solo 5000 para rendimiento
 
-
+# 👉 Mostrar conteo y primeras filas
 st.header(' Dataset (primeras 100 filas)')
 st.dataframe(df.head(100))
 
@@ -86,7 +88,7 @@ sns.histplot(df_valid_age['Edad Víctima'], bins=30, color='purple', ax=ax)
 ax.set_title('Distribución de Edad de las Víctimas')
 st.pyplot(fig_age)
 
-# 👉 Mapas por sexo con contenedores y altura ajustada
+# 👉 Mapas por sexo con contenedores
 st.header('Mapas de Crímenes Agrupados por Sexo')
 
 with st.container():
