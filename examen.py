@@ -19,7 +19,8 @@ def load_data():
     # Cargar dataset desde Kaggle
     df = kagglehub.load_dataset(
         KaggleDatasetAdapter.PANDAS,
-        "ishajangir/crime-data"
+        "ishajangir/crime-data",
+        "Crime_Data_from_2020_to_Present.csv"  # 👈 el nombre real del archivo en Kaggle
     )
 
     column_translation = {
