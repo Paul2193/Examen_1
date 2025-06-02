@@ -11,17 +11,16 @@ import gdown
 
 st.title('Análisis Estadístico de Crímenes en la ciudad de "Los Angeles"')
 
-# 👉 Cargar y limpiar los datos
 @st.cache_data
 def load_data():
-    file_id = '1-skQNlFb1w4RIRQRG4-WH-txfQA3RtlP'  # ID del archivo en Google Drive
+    file_id = '1-skQNlFb1w4RIRQRG4-WH-txfQA3RtlP'  
     url = f'https://drive.google.com/uc?id={file_id}'
     output = 'Crime_Data_from_2020_to_Present.csv'
 
     if not os.path.exists(output):
         gdown.download(url, output, quiet=False)
 
-    # 🚀 Cargar solo 90,000 filas para balancear rendimiento y representatividad
+    
     df = pd.read_csv(output, nrows=90000)
 
     column_translation = {
